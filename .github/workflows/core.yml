@@ -30,10 +30,13 @@ jobs:
 
   spm:
     # Don't run on private repo unless it is a PR.
-    if: (github.repository == 'Firebase/firebase-ios-sdk' && github.event_name == 'schedule') || github.event_name == 'pull_request'
+    if: ${{ always() }}
     runs-on: macos-11
     steps:
     - uses: actions/checkout@v2
+    - uses: mikehardy/buildcache-action@775c40d1cfea04da628359da45ee382cd87df551
+      with:
+        cache_key: ${{ matrix.os }}
     - name: Initialize xcodebuild
       run: scripts/setup_spm_tests.sh
     - name: iOS Unit Tests
@@ -48,6 +51,9 @@ jobs:
         target: [tvOS, macOS, catalyst]
     steps:
     - uses: actions/checkout@v2
+    - uses: mikehardy/buildcache-action@775c40d1cfea04da628359da45ee382cd87df551
+      with:
+        cache_key: ${{ matrix.os }}
     - name: Initialize xcodebuild
       run: scripts/setup_spm_tests.sh
     - name: Unit Tests
@@ -55,11 +61,14 @@ jobs:
 
   catalyst:
     # Don't run on private repo unless it is a PR.
-    if: (github.repository == 'Firebase/firebase-ios-sdk' && github.event_name == 'schedule') || github.event_name == 'pull_request'
+    if: ${{ always() }}
 
     runs-on: macos-11
     steps:
     - uses: actions/checkout@v2
+    - uses: mikehardy/buildcache-action@775c40d1cfea04da628359da45ee382cd87df551
+      with:
+        cache_key: ${{ matrix.os }}
     - name: Setup Bundler
       run: scripts/setup_bundler.sh
     - name: Setup project and Build Catalyst
