@@ -14,9 +14,9 @@
 
 #import "FirebaseAppDistribution/Sources/FIRAppDistributionUIService.h"
 #import "FirebaseAppDistribution/Sources/FIRFADLogger.h"
+#import "FirebaseAppDistribution/Sources/FIRSceneHelper.h"
 #import "FirebaseAppDistribution/Sources/Public/FirebaseAppDistribution/FIRAppDistribution.h"
 #import "FirebaseCore/Sources/Private/FirebaseCoreInternal.h"
-#import "FirebaseAppDistribution/Sources/FIRSceneHelper.h"
 
 #import <AuthenticationServices/AuthenticationServices.h>
 #import <SafariServices/SafariServices.h>
@@ -41,7 +41,7 @@ SFAuthenticationSession *_safariAuthenticationVC;
   self = [super init];
 
   self.safariHostingViewController = [[UIViewController alloc] init];
-    self.sceneHelper = [[FIRSceneHelper alloc] init];
+  self.sceneHelper = [[FIRSceneHelper alloc] init];
 
   return self;
 }
@@ -140,10 +140,11 @@ SFAuthenticationSession *_safariAuthenticationVC;
 }
 
 - (void)showUIAlert:(UIAlertController *)alertController {
-  [self initializeUIState];
-  [self.window.rootViewController presentViewController:alertController
-                                               animated:YES
-                                             completion:nil];
+  [self initializeUIStateWithCompletion:^{
+    [self.window.rootViewController presentViewController:alertController
+                                                 animated:YES
+                                               completion:nil];
+  }];
 }
 
 - (void)showUIAlertWithCompletion:(FIRFADUIActionCompletion)completion {
@@ -204,6 +205,10 @@ SFAuthenticationSession *_safariAuthenticationVC;
 }
 
 - (void)initializeUIState {
+  [self initializeUIStateWithCompletion:nil];
+}
+
+- (void)initializeUIStateWithCompletion:(void (^_Nullable)(void))completion {
   if (self.window) {
     return;
   }
@@ -217,11 +222,17 @@ SFAuthenticationSession *_safariAuthenticationVC;
         self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
       }
       [self windowFinishInitialization];
+      if (completion != nil) {
+        completion();
+      }
     }];
   } else {
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   }
   [self windowFinishInitialization];
+  if (completion != nil) {
+    completion();
+  }
 }
 
 - (void)windowFinishInitialization {
