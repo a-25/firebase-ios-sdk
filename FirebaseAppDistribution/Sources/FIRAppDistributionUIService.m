@@ -226,9 +226,10 @@ SFAuthenticationSession *_safariAuthenticationVC;
         completion();
       }
     }];
-  } else {
-    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    return;
   }
+
+  self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   [self windowFinishInitialization];
   if (completion != nil) {
     completion();
