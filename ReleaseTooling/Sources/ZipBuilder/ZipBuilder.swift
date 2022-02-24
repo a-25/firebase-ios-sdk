@@ -346,14 +346,16 @@ struct ZipBuilder {
     let zipDir = try assembleDistributions(withPackageKind: "Firebase",
                                            podsToInstall: podsToInstall,
                                            installedPods: installedPods,
-                                           frameworksToAssemble: frameworks)
+                                           frameworksToAssemble: frameworks,
+                                           firebaseCorePod: firebaseCorePod)
     // Replace Core Diagnostics
     var carthageFrameworks = frameworks
     carthageFrameworks["FirebaseCoreDiagnostics"] = [carthageCoreDiagnosticsXcframework]
     let carthageDir = try assembleDistributions(withPackageKind: "CarthageFirebase",
                                                 podsToInstall: podsToInstall,
                                                 installedPods: installedPods,
-                                                frameworksToAssemble: carthageFrameworks)
+                                                frameworksToAssemble: carthageFrameworks,
+                                                firebaseCorePod: firebaseCorePod)
 
     return ReleaseArtifacts(firebaseVersion: firebaseCorePod.version,
                             zipDir: zipDir, carthageDir: carthageDir)
@@ -378,7 +380,8 @@ struct ZipBuilder {
   private func assembleDistributions(withPackageKind packageKind: String,
                                      podsToInstall: [CocoaPodUtils.VersionedPod],
                                      installedPods: [String: CocoaPodUtils.PodInfo],
-                                     frameworksToAssemble: [String: [URL]]) throws -> URL {
+                                     frameworksToAssemble: [String: [URL]],
+                                     firebaseCorePod: CocoaPodUtils.PodInfo) throws -> URL {
     // Create the directory that will hold all the contents of the Zip file.
     let fileManager = FileManager.default
     let zipDir = fileManager.temporaryDirectory(withName: packageKind)
@@ -391,6 +394,10 @@ struct ZipBuilder {
                                       withIntermediateDirectories: true,
                                       attributes: nil)
     }
+      
+    // Copy all required files from the FirebaseCore pod. This will cause a fatalError if anything
+    // fails.
+      copyFirebaseCorePodFiles(fromDir: firebaseCorePod.installedLocation, to: zipDir)
 
     // Start with installing Analytics, since we'll need to exclude those frameworks from the rest
     // of the folders.
@@ -588,6 +595,32 @@ struct ZipBuilder {
 
     return copiedFrameworkNames
   }
+    
+    /// Copies required files from the FirebaseCore pod (`NOTICES`) into
+    /// the given `zipDir`. Will cause a fatalError if anything fails since the zip file can't exist
+    /// without these files.
+    private func copyFirebaseCorePodFiles(fromDir firebasePodDir: URL, to zipDir: URL) {
+        let firebasePodFiles = ["NOTICES"]
+        let firebaseFiles = firebasePodDir
+        let firebaseFilesToCopy = firebasePodFiles.map {
+            firebaseFiles.appendingPathComponent($0)
+        }
+        
+        // Copy each Firebase file.
+        for file in firebaseFilesToCopy {
+            // Each file should be copied to the destination project directory with the same name.
+            let destination = zipDir.appendingPathComponent(file.lastPathComponent)
+            do {
+                if !FileManager.default.fileExists(atPath: destination.path) {
+                    print("Copying final distribution file \(file) to \(destination)...")
+                    try FileManager.default.copyItem(at: file, to: destination)
+                }
+            } catch {
+                fatalError("Could not copy final distribution files to temporary directory before " +
+                           "building. Failed while attempting to copy \(file) to \(destination). \(error)")
+            }
+        }
+    }
 
   /// Creates the String required for this pod to be added to the README. Creates a header and
   /// lists each framework in alphabetical order with the appropriate indentation, as well as a

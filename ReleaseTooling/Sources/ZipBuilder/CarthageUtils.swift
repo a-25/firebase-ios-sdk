@@ -98,12 +98,12 @@ extension CarthageUtils {
       // Parse the JSON file, ensure that we're not trying to overwrite a release.
       var jsonManifest = parseJSONFile(fromDir: jsonDir, product: product)
 
-      if versionCheckEnabled {
-        guard jsonManifest[firebaseVersion] == nil else {
-          print("Carthage release for \(product) \(firebaseVersion) already exists - skipping.")
-          continue
-        }
-      }
+//      if versionCheckEnabled {
+//        guard jsonManifest[firebaseVersion] == nil else {
+//          print("Carthage release for \(product) \(firebaseVersion) already exists - skipping.")
+//          continue
+//        }
+//      }
 
       // Analytics includes all the Core frameworks and Firebase module, do extra work to package
       // it.
@@ -113,16 +113,16 @@ extension CarthageUtils {
                                 rootDir: packagedDir,
                                 templateDir: templateDir)
 
-//        // Copy the NOTICES file from FirebaseCore.
-//        let noticesName = "NOTICES"
-//        let coreNotices = fullPath.appendingPathComponents(["FirebaseCore.xcframework",
-//                                                            noticesName])
-//        let noticesPath = packagedDir.appendingPathComponent(noticesName)
-//        do {
-//          try FileManager.default.copyItem(at: noticesPath, to: coreNotices)
-//        } catch {
-//          fatalError("Could not copy \(noticesName) to FirebaseCore for Carthage build. \(error)")
-//        }
+        // Copy the NOTICES file from FirebaseCore.
+        let noticesName = "NOTICES"
+        let coreNotices = fullPath.appendingPathComponents(["FirebaseCore.xcframework",
+                                                            noticesName])
+        let noticesPath = packagedDir.appendingPathComponent(noticesName)
+        do {
+          try FileManager.default.copyItem(at: noticesPath, to: coreNotices)
+        } catch {
+          fatalError("Could not copy \(noticesName) to FirebaseCore for Carthage build. \(error)")
+        }
       }
 
       // Hash the contents of the directory to get a unique name for Carthage.

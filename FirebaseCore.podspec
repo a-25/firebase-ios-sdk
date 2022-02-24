@@ -40,6 +40,7 @@ Firebase Core includes FIRApp and FIROptions which provide central configuration
     'FirebaseCore/Sources/Private/*.h',
   ]
   s.private_header_files = 'FirebaseCore/Sources/Private/*.h'
+  s.resource = 'FirebaseCore/NOTICES'
 
   s.framework = 'Foundation'
   s.ios.framework = 'UIKit'
