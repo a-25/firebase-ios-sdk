@@ -205,14 +205,8 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "Firebase",
-      path: "CoreOnly/Sources",
-      publicHeadersPath: "./"
-    ),
-    .target(
       name: "FirebaseCore",
       dependencies: [
-        "Firebase",
         "FirebaseCoreDiagnostics",
         .product(name: "GULEnvironment", package: "GoogleUtilities"),
         .product(name: "GULLogger", package: "GoogleUtilities"),
@@ -246,10 +240,10 @@ let package = Package(
         .product(name: "GULLogger", package: "GoogleUtilities"),
         .product(name: "nanopb", package: "nanopb"),
       ],
-      path: "Firebase/CoreDiagnostics/FIRCDLibrary",
+      path: "FirebaseCoreDiagnostics/FIRCDLibrary",
       publicHeadersPath: ".",
       cSettings: [
-        .headerSearchPath("../../.."),
+        .headerSearchPath("../.."),
         .define("PB_FIELD_32BIT", to: "1"),
         .define("PB_NO_PACKED_STRUCTS", to: "1"),
         .define("PB_ENABLE_MALLOC", to: "1"),
@@ -1046,7 +1040,6 @@ let package = Package(
     .testTarget(
       name: "swift-test",
       dependencies: [
-        "Firebase",
         "FirebaseAuth",
         "FirebaseAppCheck",
         "FirebaseABTesting",
@@ -1082,14 +1075,12 @@ let package = Package(
       dependencies: [
         "FirebaseAnalyticsSwiftTarget",
         "FirebaseAnalyticsWrapper",
-        "Firebase",
       ],
       path: "SwiftPMTests/analytics-import-test"
     ),
     .testTarget(
       name: "objc-import-test",
       dependencies: [
-        "Firebase",
         "FirebaseAuth",
         "FirebaseABTesting",
         "FirebaseAppCheck",

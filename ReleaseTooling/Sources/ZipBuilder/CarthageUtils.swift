@@ -113,16 +113,16 @@ extension CarthageUtils {
                                 rootDir: packagedDir,
                                 templateDir: templateDir)
 
-        // Copy the NOTICES file from FirebaseCore.
-        let noticesName = "NOTICES"
-        let coreNotices = fullPath.appendingPathComponents(["FirebaseCore.xcframework",
-                                                            noticesName])
-        let noticesPath = packagedDir.appendingPathComponent(noticesName)
-        do {
-          try FileManager.default.copyItem(at: noticesPath, to: coreNotices)
-        } catch {
-          fatalError("Could not copy \(noticesName) to FirebaseCore for Carthage build. \(error)")
-        }
+//        // Copy the NOTICES file from FirebaseCore.
+//        let noticesName = "NOTICES"
+//        let coreNotices = fullPath.appendingPathComponents(["FirebaseCore.xcframework",
+//                                                            noticesName])
+//        let noticesPath = packagedDir.appendingPathComponent(noticesName)
+//        do {
+//          try FileManager.default.copyItem(at: noticesPath, to: coreNotices)
+//        } catch {
+//          fatalError("Could not copy \(noticesName) to FirebaseCore for Carthage build. \(error)")
+//        }
       }
 
       // Hash the contents of the directory to get a unique name for Carthage.
@@ -214,24 +214,6 @@ extension CarthageUtils {
       try fm.createDirectory(at: modulesDir, withIntermediateDirectories: true)
     } catch {
       fatalError("Could not create directories for Firebase framework in Carthage. \(error)")
-    }
-
-    // Copy the Firebase header and modulemap that was created in the Zip file.
-    let header = rootDir.appendingPathComponent(Constants.ProjectPath.firebaseHeader)
-    do {
-      try fm.copyItem(at: header, to: headersDir.appendingPathComponent(header.lastPathComponent))
-
-      // Generate the new modulemap since it differs from the Zip modulemap.
-      let carthageModulemap = """
-      framework module Firebase {
-        header "Firebase.h"
-        export *
-      }
-      """
-      let modulemapPath = modulesDir.appendingPathComponent("module.modulemap")
-      try carthageModulemap.write(to: modulemapPath, atomically: true, encoding: .utf8)
-    } catch {
-      fatalError("Couldn't write required files for Firebase framework in Carthage. \(error)")
     }
 
     // Copy the dummy Firebase library.

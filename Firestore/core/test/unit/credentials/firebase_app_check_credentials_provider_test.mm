@@ -91,8 +91,8 @@ namespace firebase {
 namespace firestore {
 namespace credentials {
 
-// Simulates the case where Firebase/Firestore is installed in the project but
-// Firebase/AppCheck is not available.
+// Simulates the case where FirebaseFirestore is installed in the project but
+// FirebaseAppCheck is not available.
 TEST(FirebaseAppCheckCredentialsProviderTest, GetTokenNoProvider) {
   auto token_promise = std::make_shared<std::promise<std::string>>();
 
